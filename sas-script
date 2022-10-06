@@ -1,0 +1,112 @@
+/* Generated Code (IMPORT) */
+/* Source File: banknote.csv */
+/* Source Path: /home/u61724554/MIS450 */
+
+%if %sysfunc(exist(MYFOLDER.'bank notes'n)) %then %do;
+proc sql;
+    drop table MYFOLDER.'bank notes'n;
+run;
+%end;
+
+
+FILENAME REFFILE '/home/u61724554/MIS450/banknote.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=MYFOLDER.'bank notes'n;
+	GETNAMES=YES;
+RUN;
+
+PROC CONTENTS DATA=MYFOLDER.'bank notes'n; RUN;
+
+%web_open_table(MYFOLDER.'bank notes'n);
+
+---
+/* Summary statistics of continuous variables separated by class */
+/* Histograms for variables by class */
+
+ods noproctitle;
+ods graphics / imagemap=on;
+
+proc means data=MYFOLDER.'BANK NOTES'n chartype mean std min max median n nmiss 
+		mode range vardef=df qmethod=os;
+	var V1 V2 V3 V4;
+	class Class;
+run;
+
+proc univariate data=MYFOLDER.'BANK NOTES'n vardef=df noprint;
+	var V1 V2 V3 V4;
+	class Class;
+	histogram V1 V2 V3 V4 / normal(noprint);
+run;
+
+--
+
+/* Summary statistics of continuous variables not separated by class */
+/* Histograms for variables without class */
+
+ods noproctitle;
+ods graphics / imagemap=on;
+
+proc means data=MYFOLDER.'BANK NOTES'n chartype mean std min max median n nmiss 
+		mode range vardef=df qmethod=os;
+	var V1 V2 V3 V4;
+run;
+
+proc univariate data=MYFOLDER.'BANK NOTES'n vardef=df noprint;
+	var V1 V2 V3 V4;
+	histogram V1 V2 V3 V4 / normal(noprint);
+run;
+
+---
+/* Anomaly testing with PROC univariate code */
+
+proc univariate data=MYFOLDER.'BANK NOTES'n;
+  var V1;
+  var V2;
+  var V3;
+  var V4;
+ run;
+ 
+ ---
+ /* Correlation analysis between variables */
+ 
+ proc corr data=MYFOLDER.'BANK NOTES'n;
+  var Class V1 V2 V3 V4;
+  with Class V1 V2 V3 V4;
+ run;
+ 
+ ---
+ /* Clustering technique for variable analysis */
+ data MYFOLDER.'BANK NOTES'n;
+  keep x1 x2 y id;
+  nNow=1372;
+  sdNow=1.9;
+  four_pi=4 * constant("pi");
+  call streaminit(3331333);
+  y=0;
+  id=0;
+  
+  do theta=0 to 12;
+    r=1.0 - theta / four_pi;
+    mu1=cos(theta);
+    mu2=sin (theta);
+    ss=r*r / (mu1*mu1 + mu2*mu2);
+    s=sqrt(ss);
+    mu1=s*mu1;
+    mu2=s*mu2;
+    nNow=nNow * 0.7;
+    sdNow=sdNow * 0.75;
+    
+    do i=1 to nNow;
+      x1=rand('normal', mu1,sdNow);
+      x2=rand('normal', mu2, sdNow);
+      y=1 - y;
+      id=id + 1;
+      output;
+    end;
+  end;
+run;
+
+Proc Print data=MYFOLDER.'BANK NOTES'n;
+run;
